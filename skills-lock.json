@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "git-workflow": {
+      "source": "netresearch/git-workflow-skill",
+      "sourceType": "github",
+      "skillPath": "skills/git-workflow/SKILL.md",
+      "computedHash": "ca595810ab7879c1e0d28da872a9139260239485229832349b59dcc48791f4d9"
+    }
+  }
+}
