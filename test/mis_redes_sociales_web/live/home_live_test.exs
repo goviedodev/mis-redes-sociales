@@ -86,4 +86,54 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     assert has_element?(view, "#link-form select[name='form[category]'] option[value='IA']")
     assert has_element?(view, "a[href='/admin']")
   end
+
+  test "submitting the link form with optional subcategory and long description displays them on the saved link card",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view
+    |> form("#link-form",
+      form: %{
+        category: "IA",
+        subcategory: "OCR",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/shorts/KigUHSCgDNo",
+        short_description: "AI Creator Studio",
+        long_description: "Es un video corto con todos los pasos"
+      }
+    )
+    |> render_submit()
+
+    assert has_element?(view, "#links [data-role='subcategory']", "OCR")
+
+    assert has_element?(
+             view,
+             "#links [data-role='long-description']",
+             "Es un video corto con todos los pasos"
+           )
+  end
+
+  test "submitting the link form without subcategory or long description omits empty subcategory and long description elements on the card",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view
+    |> form("#link-form",
+      form: %{
+        category: "IA",
+        subcategory: "",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/shorts/KigUHSCgDNo",
+        short_description: "AI Creator Studio",
+        long_description: ""
+      }
+    )
+    |> render_submit()
+
+    assert has_element?(view, "#links", "AI Creator Studio")
+    refute has_element?(view, "#links [data-role='subcategory']")
+    refute has_element?(view, "#links [data-role='long-description']")
+  end
 end

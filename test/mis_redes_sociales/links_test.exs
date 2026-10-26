@@ -10,4 +10,22 @@ defmodule MisRedesSociales.LinksTest do
     categories = Links.list_categories!()
     assert Enum.map(categories, & &1.name) == ["IA", "Programación"]
   end
+
+  test "saves a link with optional subcategory and long description" do
+    assert {:ok, link} =
+             Links.create_link(%{
+               category: "IA",
+               subcategory: "OCR",
+               link_type: "Youtube",
+               url: "https://www.youtube.com/shorts/KigUHSCgDNo",
+               short_description: "AI Creator Studio",
+               long_description:
+                 "Es un video corto que indica todos los pasos para crear videos para youtube"
+             })
+
+    assert link.subcategory == "OCR"
+
+    assert link.long_description ==
+             "Es un video corto que indica todos los pasos para crear videos para youtube"
+  end
 end

@@ -14,7 +14,7 @@ defmodule MisRedesSociales.Links.Link do
 
     create :create do
       primary?(true)
-      accept([:category, :link_type, :url, :short_description])
+      accept([:category, :subcategory, :link_type, :url, :short_description, :long_description])
     end
 
     read :list_recent do
@@ -30,6 +30,11 @@ defmodule MisRedesSociales.Links.Link do
       public?(true)
     end
 
+    attribute :subcategory, :string do
+      allow_nil?(true)
+      public?(true)
+    end
+
     attribute :link_type, :string do
       allow_nil?(false)
       public?(true)
@@ -42,6 +47,11 @@ defmodule MisRedesSociales.Links.Link do
 
     attribute :short_description, :string do
       allow_nil?(false)
+      public?(true)
+    end
+
+    attribute :long_description, :string do
+      allow_nil?(true)
       public?(true)
     end
 

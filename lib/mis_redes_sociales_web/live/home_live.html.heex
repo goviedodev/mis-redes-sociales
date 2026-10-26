@@ -21,6 +21,12 @@
           options={@categories}
         />
         <.input
+          field={@form[:subcategory]}
+          type="text"
+          label="Subcategoría (Opcional)"
+          placeholder="Ej. OCR"
+        />
+        <.input
           field={@form[:link_type]}
           type="select"
           label="Tipo de Enlace"
@@ -38,6 +44,12 @@
           type="text"
           label="Descripción Corta"
           placeholder="Ej. AI Creator Studio"
+        />
+        <.input
+          field={@form[:long_description]}
+          type="textarea"
+          label="Descripción Larga (Opcional)"
+          placeholder="Notas detalladas sobre el enlace..."
         />
         <button id="submit-link" type="submit" class="btn btn-primary w-full">
           Guardar Enlace
@@ -57,10 +69,22 @@
           class="card bg-base-200 p-4 rounded-xl shadow-xs space-y-2"
         >
           <div class="flex items-center justify-between gap-2">
-            <span class="badge badge-primary">{link.category}</span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="badge badge-primary">{link.category}</span>
+              <span :if={link.subcategory} data-role="subcategory" class="badge badge-secondary">
+                {link.subcategory}
+              </span>
+            </div>
             <span class="badge badge-outline">{link.link_type}</span>
           </div>
           <p class="font-semibold text-base">{link.short_description}</p>
+          <p
+            :if={link.long_description}
+            data-role="long-description"
+            class="text-sm opacity-80 whitespace-pre-line"
+          >
+            {link.long_description}
+          </p>
           <a
             href={link.url}
             target="_blank"
