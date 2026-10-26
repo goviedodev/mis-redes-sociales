@@ -9,9 +9,11 @@ import Config
 
 config :mis_redes_sociales,
   ecto_repos: [MisRedesSociales.Repo],
-  ash_domains: [],
+  ash_domains: [MisRedesSociales.Links],
   default_timezone: "America/Santiago",
   generators: [timestamp_type: :utc_datetime]
+
+config :ash, default_string_length_count: :codepoints
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 

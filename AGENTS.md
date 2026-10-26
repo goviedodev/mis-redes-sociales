@@ -1,8 +1,33 @@
 This is a web application written using the Phoenix web framework.
 
+# Agent Workflow & Project Router (`hola-ai`)
+
+This project follows the **hola-ai** Extreme Programming workflow: vertical user stories, acceptance criteria, test-first pair programming, and simple design.
+
+```text
+/backlog  →  /story  →  /pair
+  what       what exactly   how
+```
+
+## Project Reference Router
+
+Always consult these project documents before planning, coding, or deploying:
+
+- **Product Requirements & Technical Specs:** [PRD.md](./PRD.md)
+- **Project Backlog & Stack:** [backlog.md](./backlog.md)
+- **Development & Production (`asus`) Environments:** [PROJECT-ENVIRONMENT.md](./PROJECT-ENVIRONMENT.md)
+- **Git & PR Workflow Skill:** [.agents/skills/git-workflow/SKILL.md](./.agents/skills/git-workflow/SKILL.md)
+
+## Skill Routing Rules
+
+1. **Backlog (`/backlog`)** — Read `/home/goviedo/.gemini/skills/backlog/SKILL.md`: clarify stack and expensive decisions (one question at a time), then propose one-line vertical user stories.
+2. **Story (`/story`)** — Read `/home/goviedo/.gemini/skills/story/SKILL.md`: refine a single user story into 2–3 `Given / When / Then` acceptance criteria and a ≤5-bullet mini-plan; wait for approval.
+3. **Pair (`/pair`)** — Read `/home/goviedo/.gemini/skills/pair/SKILL.md`: propose the test list first, wait for approval, then execute TDD cycles (Red → Green).
+
 ## Project guidelines
 
 - Use `mix precommit` alias when you are done with all changes and fix any pending issues
+- **Always separate LiveView logic from HTML templates**: keep LiveView event handling and state logic in `<name>_live.ex` and place the markup in a sibling `<name>_live.html.heex` template file instead of inline `render/1` with `~H`
 - Use the already included and available `:req` (`Req`) library for HTTP requests, **avoid** `:httpoison`, `:tesla`, and `:httpc`. Req is included by default and is the preferred HTTP client for Phoenix apps
 
 ### Phoenix v1.8 guidelines
