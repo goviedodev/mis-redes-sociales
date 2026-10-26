@@ -33,6 +33,7 @@ defmodule MisRedesSocialesWeb.Router do
     live_session :authenticated,
       on_mount: [{MisRedesSocialesWeb.PinAuth, :ensure_unlocked}] do
       live "/", HomeLive, :index
+      live "/admin", AdminLive, :index
     end
   end
 

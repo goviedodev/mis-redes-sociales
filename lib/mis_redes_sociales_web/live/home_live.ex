@@ -9,10 +9,11 @@ defmodule MisRedesSocialesWeb.HomeLive do
   @impl true
   def mount(_params, _session, socket) do
     links = Links.list_links!()
+    categories = Links.list_categories!() |> Enum.map(& &1.name)
 
     {:ok,
      socket
-     |> assign(page_title: "Mis Redes Sociales", link_types: @link_types)
+     |> assign(page_title: "Mis Redes Sociales", link_types: @link_types, categories: categories)
      |> assign_new_form()
      |> stream(:links, links)}
   end

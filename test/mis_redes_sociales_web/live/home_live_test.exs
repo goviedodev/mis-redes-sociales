@@ -8,6 +8,7 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
 
   test "submitting the Spanish link form with valid category, link type, URL, and short description saves the link and renders it in the saved links stream",
        %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
     {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
 
     assert has_element?(view, "#link-form")
@@ -72,5 +73,17 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
 
     assert html =~ "es obligatorio"
     assert MisRedesSociales.Links.list_links!() == []
+  end
+
+  test "populates the category select dropdown on the home link form with created categories",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "Diseño"})
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    assert has_element?(view, "#link-form select[name='form[category]'] option[value='Diseño']")
+    assert has_element?(view, "#link-form select[name='form[category]'] option[value='IA']")
+    assert has_element?(view, "a[href='/admin']")
   end
 end

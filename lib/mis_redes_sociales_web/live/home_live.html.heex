@@ -1,14 +1,25 @@
 <Layouts.app flash={@flash}>
   <div class="space-y-8">
-    <div class="space-y-2">
-      <h1 class="text-2xl font-bold">Mis Redes Sociales</h1>
-      <p class="text-sm opacity-75">Guarda y organiza tus enlaces favoritos</p>
+    <div class="flex items-center justify-between gap-2">
+      <div class="space-y-1">
+        <h1 class="text-2xl font-bold">Mis Redes Sociales</h1>
+        <p class="text-sm opacity-75">Guarda y organiza tus enlaces favoritos</p>
+      </div>
+      <.link navigate={~p"/admin"} id="go-to-admin" class="btn btn-outline btn-sm">
+        <.icon name="hero-cog-6-tooth" class="w-4 h-4" /> Categorías
+      </.link>
     </div>
 
     <div class="card bg-base-200 p-4 rounded-2xl shadow-sm">
       <h2 class="text-lg font-semibold mb-3">Nuevo Enlace</h2>
       <.form for={@form} id="link-form" phx-change="validate" phx-submit="save" class="space-y-3">
-        <.input field={@form[:category]} type="text" label="Categoría" placeholder="Ej. IA" />
+        <.input
+          field={@form[:category]}
+          type="select"
+          label="Categoría"
+          prompt="Selecciona una categoría"
+          options={@categories}
+        />
         <.input
           field={@form[:link_type]}
           type="select"

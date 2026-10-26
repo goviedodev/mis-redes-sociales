@@ -1,0 +1,50 @@
+<Layouts.app flash={@flash}>
+  <div class="space-y-8">
+    <div class="flex items-center justify-between gap-2">
+      <div class="space-y-1">
+        <h1 class="text-2xl font-bold">Administración</h1>
+        <p class="text-sm opacity-75">Gestiona las categorías de tus enlaces</p>
+      </div>
+      <.link navigate={~p"/"} id="back-to-home" class="btn btn-ghost btn-sm">
+        <.icon name="hero-arrow-left" class="w-4 h-4" /> Volver
+      </.link>
+    </div>
+
+    <div class="card bg-base-200 p-4 rounded-2xl shadow-sm">
+      <h2 class="text-lg font-semibold mb-3">Nueva Categoría</h2>
+      <.form
+        for={@form}
+        id="category-form"
+        phx-change="validate"
+        phx-submit="save"
+        class="space-y-3"
+      >
+        <.input
+          field={@form[:name]}
+          type="text"
+          label="Nombre de Categoría"
+          placeholder="Ej. IA"
+        />
+        <button id="submit-category" type="submit" class="btn btn-primary w-full">
+          Crear Categoría
+        </button>
+      </.form>
+    </div>
+
+    <div class="space-y-3">
+      <h2 class="text-lg font-semibold">Categorías Creadas</h2>
+      <div id="categories" phx-update="stream" class="space-y-2">
+        <div id="categories-empty" class="hidden only:block text-sm opacity-60 py-4 text-center">
+          No hay categorías creadas aún.
+        </div>
+        <div
+          :for={{id, category} <- @streams.categories}
+          id={id}
+          class="card bg-base-200 p-3 rounded-xl shadow-xs flex flex-row items-center justify-between"
+        >
+          <span class="font-medium text-base">{category.name}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.app>
