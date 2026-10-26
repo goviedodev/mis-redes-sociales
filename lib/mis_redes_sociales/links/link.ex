@@ -28,7 +28,20 @@ defmodule MisRedesSociales.Links.Link do
     end
 
     read :list_recent do
+      argument(:category, :string, allow_nil?: true)
+      argument(:subcategory, :string, allow_nil?: true)
+      argument(:link_type, :string, allow_nil?: true)
+
       prepare(build(sort: [inserted_at: :desc]))
+
+      prepare(fn query, _context ->
+        require Ash.Query
+
+        query
+        |> filter_by_category(Ash.Query.get_argument(query, :category))
+        |> filter_by_subcategory(Ash.Query.get_argument(query, :subcategory))
+        |> filter_by_link_type(Ash.Query.get_argument(query, :link_type))
+      end)
     end
   end
 
@@ -80,5 +93,27 @@ defmodule MisRedesSociales.Links.Link do
 
   validations do
     validate(one_of(:link_type, ["Youtube", "Facebook", "Instagram", "TikTok"]))
+  end
+
+  defp filter_by_category(query, val) when val in [nil, ""], do: query
+
+  defp filter_by_category(query, val) do
+    require Ash.Query
+    Ash.Query.filter(query, category == ^val)
+  end
+
+  defp filter_by_subcategory(query, val) when val in [nil, ""], do: query
+
+  defp filter_by_subcategory(query, val) do
+    require Ash.Query
+    pattern = "%#{String.downcase(String.trim(val))}%"
+    Ash.Query.filter(query, fragment("lower(?) LIKE ?", subcategory, ^pattern))
+  end
+
+  defp filter_by_link_type(query, val) when val in [nil, ""], do: query
+
+  defp filter_by_link_type(query, val) do
+    require Ash.Query
+    Ash.Query.filter(query, link_type == ^val)
   end
 end

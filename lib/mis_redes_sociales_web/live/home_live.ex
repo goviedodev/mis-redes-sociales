@@ -6,6 +6,8 @@ defmodule MisRedesSocialesWeb.HomeLive do
 
   @link_types ["Youtube", "Facebook", "Instagram", "TikTok"]
 
+  @default_filters %{"category" => "", "subcategory" => "", "link_type" => ""}
+
   @impl true
   def mount(_params, _session, socket) do
     links = Links.list_links!()
@@ -17,7 +19,9 @@ defmodule MisRedesSocialesWeb.HomeLive do
        page_title: "Mis Redes Sociales",
        link_types: @link_types,
        categories: categories,
-       active_tab: "new"
+       active_tab: "new",
+       filters: @default_filters,
+       filter_form: to_form(@default_filters, as: :filter)
      )
      |> allow_upload(:artifact, accept: :any, max_entries: 1, max_file_size: 20_000_000)
      |> assign_new_form()
@@ -27,6 +31,25 @@ defmodule MisRedesSocialesWeb.HomeLive do
   @impl true
   def handle_event("switch_tab", %{"tab" => tab}, socket) when tab in ["new", "saved"] do
     {:noreply, assign(socket, :active_tab, tab)}
+  end
+
+  def handle_event("filter", %{"filter" => filter_params}, socket) do
+    filters = Map.merge(@default_filters, filter_params)
+    links = Links.list_links!(filters)
+
+    {:noreply,
+     socket
+     |> assign(filters: filters, filter_form: to_form(filters, as: :filter))
+     |> stream(:links, links, reset: true)}
+  end
+
+  def handle_event("clear_filters", _params, socket) do
+    links = Links.list_links!(@default_filters)
+
+    {:noreply,
+     socket
+     |> assign(filters: @default_filters, filter_form: to_form(@default_filters, as: :filter))
+     |> stream(:links, links, reset: true)}
   end
 
   def handle_event("validate", %{"form" => params}, socket) do
@@ -56,10 +79,12 @@ defmodule MisRedesSocialesWeb.HomeLive do
              end
            end
          ) do
-      {:ok, link} ->
+      {:ok, _link} ->
+        links = Links.list_links!(socket.assigns.filters)
+
         {:noreply,
          socket
-         |> stream_insert(:links, link, at: 0)
+         |> stream(:links, links, reset: true)
          |> assign(:active_tab, "saved")
          |> assign_new_form()}
 

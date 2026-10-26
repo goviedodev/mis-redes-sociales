@@ -247,4 +247,99 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     assert has_element?(view, "#new-link-panel.hidden")
     assert has_element?(view, "#links", "AI Creator Studio")
   end
+
+  test "filtering saved links by category, subcategory, or link type in the Enlaces Guardados tab displays only matching links",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "Diseño"})
+
+    {:ok, _} =
+      MisRedesSociales.Links.create_link(%{
+        category: "IA",
+        subcategory: "OCR",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/watch?v=1",
+        short_description: "Video de OCR"
+      })
+
+    {:ok, _} =
+      MisRedesSociales.Links.create_link(%{
+        category: "IA",
+        subcategory: "Agentes",
+        link_type: "TikTok",
+        url: "https://www.tiktok.com/@user/video/2",
+        short_description: "TikTok de Agentes"
+      })
+
+    {:ok, _} =
+      MisRedesSociales.Links.create_link(%{
+        category: "Diseño",
+        subcategory: "UI",
+        link_type: "Instagram",
+        url: "https://www.instagram.com/p/3",
+        short_description: "Post de Diseño UI"
+      })
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view
+    |> form("#filter-form", filter: %{category: "IA", subcategory: "", link_type: ""})
+    |> render_change()
+
+    assert has_element?(view, "#links", "Video de OCR")
+    assert has_element?(view, "#links", "TikTok de Agentes")
+    refute has_element?(view, "#links", "Post de Diseño UI")
+
+    view
+    |> form("#filter-form", filter: %{category: "IA", subcategory: "ocr", link_type: ""})
+    |> render_change()
+
+    assert has_element?(view, "#links", "Video de OCR")
+    refute has_element?(view, "#links", "TikTok de Agentes")
+
+    view
+    |> form("#filter-form", filter: %{category: "", subcategory: "", link_type: "Instagram"})
+    |> render_change()
+
+    assert has_element?(view, "#links", "Post de Diseño UI")
+    refute has_element?(view, "#links", "Video de OCR")
+  end
+
+  test "clearing active filters restores the full saved links list",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "Diseño"})
+
+    {:ok, _} =
+      MisRedesSociales.Links.create_link(%{
+        category: "IA",
+        subcategory: "OCR",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/watch?v=1",
+        short_description: "Video de OCR"
+      })
+
+    {:ok, _} =
+      MisRedesSociales.Links.create_link(%{
+        category: "Diseño",
+        subcategory: "UI",
+        link_type: "Instagram",
+        url: "https://www.instagram.com/p/3",
+        short_description: "Post de Diseño UI"
+      })
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view
+    |> form("#filter-form", filter: %{category: "IA", subcategory: "ocr", link_type: ""})
+    |> render_change()
+
+    assert has_element?(view, "#links", "Video de OCR")
+    refute has_element?(view, "#links", "Post de Diseño UI")
+
+    view |> element("#clear-filters") |> render_click()
+
+    assert has_element?(view, "#links", "Video de OCR")
+    assert has_element?(view, "#links", "Post de Diseño UI")
+  end
 end
