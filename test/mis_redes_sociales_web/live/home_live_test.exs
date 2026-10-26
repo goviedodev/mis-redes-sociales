@@ -197,4 +197,54 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     assert has_element?(view, "#links", "AI Creator Studio")
     refute has_element?(view, "#links [data-role='artifact-link']")
   end
+
+  test "renders Nuevo Enlace and Enlaces Guardados tabs with Nuevo Enlace active by default and Enlaces Guardados panel hidden",
+       %{conn: conn} do
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    assert has_element?(view, "#tab-new.tab-active", "Nuevo Enlace")
+    assert has_element?(view, "#tab-saved:not(.tab-active)", "Enlaces Guardados")
+    assert has_element?(view, "#new-link-panel:not(.hidden)")
+    assert has_element?(view, "#saved-links-panel.hidden")
+  end
+
+  test "clicking Enlaces Guardados and Nuevo Enlace tabs switches the visible panel",
+       %{conn: conn} do
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view |> element("#tab-saved") |> render_click()
+
+    assert has_element?(view, "#tab-saved.tab-active", "Enlaces Guardados")
+    assert has_element?(view, "#tab-new:not(.tab-active)", "Nuevo Enlace")
+    assert has_element?(view, "#saved-links-panel:not(.hidden)")
+    assert has_element?(view, "#new-link-panel.hidden")
+
+    view |> element("#tab-new") |> render_click()
+
+    assert has_element?(view, "#tab-new.tab-active", "Nuevo Enlace")
+    assert has_element?(view, "#new-link-panel:not(.hidden)")
+    assert has_element?(view, "#saved-links-panel.hidden")
+  end
+
+  test "saving a valid link automatically switches the active tab to Enlaces Guardados",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view
+    |> form("#link-form",
+      form: %{
+        category: "IA",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/shorts/KigUHSCgDNo",
+        short_description: "AI Creator Studio"
+      }
+    )
+    |> render_submit()
+
+    assert has_element?(view, "#tab-saved.tab-active", "Enlaces Guardados")
+    assert has_element?(view, "#saved-links-panel:not(.hidden)")
+    assert has_element?(view, "#new-link-panel.hidden")
+    assert has_element?(view, "#links", "AI Creator Studio")
+  end
 end

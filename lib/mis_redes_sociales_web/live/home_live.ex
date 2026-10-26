@@ -13,13 +13,22 @@ defmodule MisRedesSocialesWeb.HomeLive do
 
     {:ok,
      socket
-     |> assign(page_title: "Mis Redes Sociales", link_types: @link_types, categories: categories)
+     |> assign(
+       page_title: "Mis Redes Sociales",
+       link_types: @link_types,
+       categories: categories,
+       active_tab: "new"
+     )
      |> allow_upload(:artifact, accept: :any, max_entries: 1, max_file_size: 20_000_000)
      |> assign_new_form()
      |> stream(:links, links)}
   end
 
   @impl true
+  def handle_event("switch_tab", %{"tab" => tab}, socket) when tab in ["new", "saved"] do
+    {:noreply, assign(socket, :active_tab, tab)}
+  end
+
   def handle_event("validate", %{"form" => params}, socket) do
     form =
       AshPhoenix.Form.validate(socket.assigns.form.source, params)
@@ -51,6 +60,7 @@ defmodule MisRedesSocialesWeb.HomeLive do
         {:noreply,
          socket
          |> stream_insert(:links, link, at: 0)
+         |> assign(:active_tab, "saved")
          |> assign_new_form()}
 
       {:error, form} ->

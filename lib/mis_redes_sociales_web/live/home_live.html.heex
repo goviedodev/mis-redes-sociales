@@ -10,7 +10,33 @@
       </.link>
     </div>
 
-    <div class="card bg-base-200 p-4 rounded-2xl shadow-sm">
+    <div role="tablist" class="tabs tabs-box grid grid-cols-2">
+      <button
+        type="button"
+        id="tab-new"
+        role="tab"
+        phx-click="switch_tab"
+        phx-value-tab="new"
+        class={["tab font-medium", @active_tab == "new" && "tab-active"]}
+      >
+        Nuevo Enlace
+      </button>
+      <button
+        type="button"
+        id="tab-saved"
+        role="tab"
+        phx-click="switch_tab"
+        phx-value-tab="saved"
+        class={["tab font-medium", @active_tab == "saved" && "tab-active"]}
+      >
+        Enlaces Guardados
+      </button>
+    </div>
+
+    <div
+      id="new-link-panel"
+      class={["card bg-base-200 p-4 rounded-2xl shadow-sm", @active_tab != "new" && "hidden"]}
+    >
       <h2 class="text-lg font-semibold mb-3">Nuevo Enlace</h2>
       <.form for={@form} id="link-form" phx-change="validate" phx-submit="save" class="space-y-3">
         <.input
@@ -67,7 +93,7 @@
       </.form>
     </div>
 
-    <div class="space-y-3">
+    <div id="saved-links-panel" class={["space-y-3", @active_tab != "saved" && "hidden"]}>
       <h2 class="text-lg font-semibold">Enlaces Guardados</h2>
       <div id="links" phx-update="stream" class="space-y-3">
         <div id="links-empty" class="hidden only:block text-sm opacity-60 py-4 text-center">
