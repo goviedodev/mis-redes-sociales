@@ -51,6 +51,16 @@
           label="Descripción Larga (Opcional)"
           placeholder="Notas detalladas sobre el enlace..."
         />
+        <div class="space-y-1">
+          <label class="label text-sm font-medium">Archivo Adjunto (Opcional)</label>
+          <.live_file_input
+            upload={@uploads.artifact}
+            class="file-input file-input-bordered w-full"
+          />
+          <div :for={entry <- @uploads.artifact.entries} class="text-xs opacity-75">
+            {entry.client_name}
+          </div>
+        </div>
         <button id="submit-link" type="submit" class="btn btn-primary w-full">
           Guardar Enlace
         </button>
@@ -93,6 +103,18 @@
           >
             {link.url}
           </a>
+          <div :if={link.artifact_path}>
+            <a
+              href={"/artifacts/#{link.artifact_path}"}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-role="artifact-link"
+              class="btn btn-xs btn-outline gap-1"
+            >
+              <.icon name="hero-paper-clip" class="w-3.5 h-3.5" />
+              {link.artifact_name}
+            </a>
+          </div>
         </div>
       </div>
     </div>

@@ -39,3 +39,7 @@ npm-debug.log
 *.db
 *.db-*
 
+# Uploaded artifacts
+/artifacts/*
+!/artifacts/.gitkeep
+

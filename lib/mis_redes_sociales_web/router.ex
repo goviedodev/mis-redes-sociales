@@ -30,6 +30,8 @@ defmodule MisRedesSocialesWeb.Router do
   scope "/", MisRedesSocialesWeb do
     pipe_through [:browser, :require_pin]
 
+    get "/artifacts/:filename", ArtifactController, :show
+
     live_session :authenticated,
       on_mount: [{MisRedesSocialesWeb.PinAuth, :ensure_unlocked}] do
       live "/", HomeLive, :index

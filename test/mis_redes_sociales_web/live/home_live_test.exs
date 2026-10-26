@@ -136,4 +136,65 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     refute has_element?(view, "#links [data-role='subcategory']")
     refute has_element?(view, "#links [data-role='long-description']")
   end
+
+  test "uploading an optional artifact file when saving a link stores the file in artifacts/ and displays the download link with its filename on the card",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    artifact =
+      file_input(view, "#link-form", :artifact, [
+        %{
+          name: "guia-ocr.pdf",
+          content: "%PDF-1.4 sample content",
+          type: "application/pdf"
+        }
+      ])
+
+    assert render_upload(artifact, "guia-ocr.pdf") =~ "guia-ocr.pdf"
+
+    view
+    |> form("#link-form",
+      form: %{
+        category: "IA",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/shorts/KigUHSCgDNo",
+        short_description: "AI Creator Studio"
+      }
+    )
+    |> render_submit()
+
+    [saved_link] = MisRedesSociales.Links.list_links!()
+    stored_file = Path.join("artifacts", saved_link.artifact_path)
+    on_exit(fn -> File.rm(stored_file) end)
+
+    assert saved_link.artifact_name == "guia-ocr.pdf"
+    assert File.read!(stored_file) == "%PDF-1.4 sample content"
+
+    assert has_element?(
+             view,
+             "#links a[data-role='artifact-link'][href='/artifacts/#{saved_link.artifact_path}']",
+             "guia-ocr.pdf"
+           )
+  end
+
+  test "submitting the link form without an artifact file omits the artifact link on the card",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view
+    |> form("#link-form",
+      form: %{
+        category: "IA",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/shorts/KigUHSCgDNo",
+        short_description: "AI Creator Studio"
+      }
+    )
+    |> render_submit()
+
+    assert has_element?(view, "#links", "AI Creator Studio")
+    refute has_element?(view, "#links [data-role='artifact-link']")
+  end
 end
