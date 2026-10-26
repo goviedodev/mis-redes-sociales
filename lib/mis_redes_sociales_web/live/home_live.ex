@@ -21,7 +21,9 @@ defmodule MisRedesSocialesWeb.HomeLive do
        categories: categories,
        active_tab: "new",
        filters: @default_filters,
-       filter_form: to_form(@default_filters, as: :filter)
+       filter_form: to_form(@default_filters, as: :filter),
+       editing_link_id: nil,
+       edit_form: nil
      )
      |> allow_upload(:artifact, accept: :any, max_entries: 1, max_file_size: 20_000_000)
      |> assign_new_form()
@@ -50,6 +52,57 @@ defmodule MisRedesSocialesWeb.HomeLive do
      socket
      |> assign(filters: @default_filters, filter_form: to_form(@default_filters, as: :filter))
      |> stream(:links, links, reset: true)}
+  end
+
+  def handle_event("edit_link", %{"id" => id}, socket) do
+    link = Links.get_link!(id)
+
+    edit_form =
+      link
+      |> AshPhoenix.Form.for_update(:update, as: "edit_form")
+      |> to_form()
+
+    {:noreply,
+     socket
+     |> assign(editing_link_id: link.id, edit_form: edit_form)
+     |> stream_insert(:links, link)}
+  end
+
+  def handle_event("cancel_edit", %{"id" => id}, socket) do
+    link = Links.get_link!(id)
+
+    {:noreply,
+     socket
+     |> assign(editing_link_id: nil, edit_form: nil)
+     |> stream_insert(:links, link)}
+  end
+
+  def handle_event("save_edit", %{"edit_form" => params}, socket) do
+    case AshPhoenix.Form.submit(socket.assigns.edit_form.source, params: params) do
+      {:ok, updated_link} ->
+        links = Links.list_links!(socket.assigns.filters)
+
+        {:noreply,
+         socket
+         |> assign(editing_link_id: nil, edit_form: nil)
+         |> stream(:links, links, reset: true)
+         |> stream_insert(:links, updated_link)}
+
+      {:error, form} ->
+        link = Links.get_link!(socket.assigns.editing_link_id)
+
+        {:noreply,
+         socket
+         |> assign(:edit_form, to_form(form, as: "edit_form"))
+         |> stream_insert(:links, link)}
+    end
+  end
+
+  def handle_event("delete_link", %{"id" => id}, socket) do
+    link = Links.get_link!(id)
+    :ok = Links.destroy_link!(link)
+
+    {:noreply, stream_delete(socket, :links, link)}
   end
 
   def handle_event("validate", %{"form" => params}, socket) do

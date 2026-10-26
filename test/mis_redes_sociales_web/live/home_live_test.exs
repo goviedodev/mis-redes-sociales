@@ -342,4 +342,84 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     assert has_element?(view, "#links", "Video de OCR")
     assert has_element?(view, "#links", "Post de Diseño UI")
   end
+
+  test "editing a saved link in the Enlaces Guardados tab updates the card and supports canceling",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "Programación"})
+
+    {:ok, link} =
+      MisRedesSociales.Links.create_link(%{
+        category: "IA",
+        subcategory: "OCR",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/watch?v=1",
+        short_description: "Video de OCR",
+        long_description: "Nota original"
+      })
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+    view |> element("#tab-saved") |> render_click()
+
+    # Open edit form and cancel
+    view |> element("#edit-link-#{link.id}") |> render_click()
+    assert has_element?(view, "#edit-form-#{link.id}")
+
+    view |> element("#cancel-edit-#{link.id}") |> render_click()
+    refute has_element?(view, "#edit-form-#{link.id}")
+    assert has_element?(view, "#links", "Video de OCR")
+
+    # Open edit form and submit updated fields
+    view |> element("#edit-link-#{link.id}") |> render_click()
+
+    view
+    |> form("#edit-form-#{link.id}",
+      edit_form: %{
+        category: "Programación",
+        subcategory: "Elixir",
+        link_type: "TikTok",
+        url: "https://www.tiktok.com/@dev/video/10",
+        short_description: "Video de Elixir actualizado",
+        long_description: "Nota actualizada"
+      }
+    )
+    |> render_submit()
+
+    refute has_element?(view, "#edit-form-#{link.id}")
+    assert has_element?(view, "#links", "Video de Elixir actualizado")
+    assert has_element?(view, "#links", "Programación")
+    assert has_element?(view, "#links", "Elixir")
+    assert has_element?(view, "#links", "Nota actualizada")
+  end
+
+  test "deleting a saved link in the Enlaces Guardados tab removes it from the list and cleans up its artifact file",
+       %{conn: conn} do
+    artifacts_dir = Application.get_env(:mis_redes_sociales, :artifacts_dir, "artifacts")
+    File.mkdir_p!(artifacts_dir)
+    artifact_filename = "test-delete-#{System.unique_integer([:positive])}-manual.pdf"
+    artifact_full_path = Path.join(artifacts_dir, artifact_filename)
+    File.write!(artifact_full_path, "%PDF-1.4 dummy")
+
+    {:ok, link} =
+      MisRedesSociales.Links.create_link(%{
+        category: "IA",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/watch?v=del",
+        short_description: "Enlace por eliminar",
+        artifact_name: "manual.pdf",
+        artifact_path: artifact_filename
+      })
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+    view |> element("#tab-saved") |> render_click()
+
+    assert has_element?(view, "#links", "Enlace por eliminar")
+    assert File.exists?(artifact_full_path)
+
+    view |> element("#delete-link-#{link.id}") |> render_click()
+
+    refute has_element?(view, "#links", "Enlace por eliminar")
+    assert MisRedesSociales.Links.list_links!() == []
+    refute File.exists?(artifact_full_path)
+  end
 end

@@ -11,8 +11,9 @@ Expensive decisions: none (single-user PIN access, Spanish-only, installable PWA
 5. ✅ As a user, I want to upload an optional artifact file (such as a PDF) to a link and open or download it later, so that I can keep supporting documents alongside the video or post. Requires: #2
 6. ✅ As a user, I want to switch between a "Nuevo Enlace" tab and an "Enlaces Guardados" tab on the main screen, so that I can focus on either adding a link or browsing my saved links without cluttering the mobile screen. Requires: #2
 7. ✅ As a user, I want to filter my saved links by category, subcategory, or link type, so that I can quickly find specific links as my collection grows. Requires: #4
-8. As a user, I want to edit or delete a saved link, so that I can fix mistakes or remove outdated links. Requires: #2
-9. As a user, I want to switch between 3 visual themes, so that I can read and use the app comfortably in different lighting conditions. Requires: #1
-10. As a user, I want to install the web app on my phone or computer as a PWA, so that I can launch it directly from my home screen like a native app. Requires: #1
-11. As a user, I want my database to be automatically backed up every day at 1:00 AM (`America/Santiago`), so that I never lose my saved collection. Requires: #2
-12. As a user, I want to run the complete application with Docker Compose, so that it runs reliably on my Asus home network computer with persistent database and artifacts. Requires: #2
+8. ✅ As a user, I want to edit or delete a saved link, so that I can fix mistakes or remove outdated links. Requires: #2
+9. As a user, I want to see a confirmation dialog before deleting a saved link and only delete it when I press accept, so that I don't accidentally remove a link. Requires: #8
+10. As a user, I want to switch between 3 visual themes, so that I can read and use the app comfortably in different lighting conditions. Requires: #1
+11. As a user, I want to install the web app on my phone or computer as a PWA, so that I can launch it directly from my home screen like a native app. Requires: #1
+12. As a user, I want my database to be automatically backed up every day at 1:00 AM (`America/Santiago`), so that I never lose my saved collection. Requires: #2
+13. As a user, I want to run the complete application with Docker Compose, so that it runs reliably on my Asus home network computer with persistent database and artifacts. Requires: #2

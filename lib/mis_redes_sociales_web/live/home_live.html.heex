@@ -142,43 +142,117 @@
           id={id}
           class="card bg-base-200 p-4 rounded-xl shadow-xs space-y-2"
         >
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="badge badge-primary">{link.category}</span>
-              <span :if={link.subcategory} data-role="subcategory" class="badge badge-secondary">
-                {link.subcategory}
-              </span>
+          <%= if @editing_link_id == link.id do %>
+            <.form
+              for={@edit_form}
+              id={"edit-form-#{link.id}"}
+              phx-submit="save_edit"
+              class="space-y-3"
+            >
+              <.input
+                field={@edit_form[:category]}
+                type="select"
+                label="Categoría"
+                options={@categories}
+              />
+              <.input
+                field={@edit_form[:subcategory]}
+                type="text"
+                label="Subcategoría (Opcional)"
+              />
+              <.input
+                field={@edit_form[:link_type]}
+                type="select"
+                label="Tipo de Enlace"
+                options={@link_types}
+              />
+              <.input field={@edit_form[:url]} type="url" label="Enlace (URL)" />
+              <.input
+                field={@edit_form[:short_description]}
+                type="text"
+                label="Descripción Corta"
+              />
+              <.input
+                field={@edit_form[:long_description]}
+                type="textarea"
+                label="Descripción Larga (Opcional)"
+              />
+              <div class="flex justify-end gap-2">
+                <button
+                  type="button"
+                  id={"cancel-edit-#{link.id}"}
+                  phx-click="cancel_edit"
+                  phx-value-id={link.id}
+                  class="btn btn-ghost btn-sm"
+                >
+                  Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm">
+                  Guardar cambios
+                </button>
+              </div>
+            </.form>
+          <% else %>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="badge badge-primary">{link.category}</span>
+                <span :if={link.subcategory} data-role="subcategory" class="badge badge-secondary">
+                  {link.subcategory}
+                </span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="badge badge-outline">{link.link_type}</span>
+                <button
+                  type="button"
+                  id={"edit-link-#{link.id}"}
+                  phx-click="edit_link"
+                  phx-value-id={link.id}
+                  class="btn btn-ghost btn-xs"
+                  aria-label="Editar enlace"
+                >
+                  <.icon name="hero-pencil-square" class="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  id={"delete-link-#{link.id}"}
+                  phx-click="delete_link"
+                  phx-value-id={link.id}
+                  class="btn btn-ghost btn-xs text-error"
+                  aria-label="Eliminar enlace"
+                >
+                  <.icon name="hero-trash" class="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            <span class="badge badge-outline">{link.link_type}</span>
-          </div>
-          <p class="font-semibold text-base">{link.short_description}</p>
-          <p
-            :if={link.long_description}
-            data-role="long-description"
-            class="text-sm opacity-80 whitespace-pre-line"
-          >
-            {link.long_description}
-          </p>
-          <a
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link link-primary text-sm break-all"
-          >
-            {link.url}
-          </a>
-          <div :if={link.artifact_path}>
+            <p class="font-semibold text-base">{link.short_description}</p>
+            <p
+              :if={link.long_description}
+              data-role="long-description"
+              class="text-sm opacity-80 whitespace-pre-line"
+            >
+              {link.long_description}
+            </p>
             <a
-              href={"/artifacts/#{link.artifact_path}"}
+              href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              data-role="artifact-link"
-              class="btn btn-xs btn-outline gap-1"
+              class="link link-primary text-sm break-all"
             >
-              <.icon name="hero-paper-clip" class="w-3.5 h-3.5" />
-              {link.artifact_name}
+              {link.url}
             </a>
-          </div>
+            <div :if={link.artifact_path}>
+              <a
+                href={"/artifacts/#{link.artifact_path}"}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-role="artifact-link"
+                class="btn btn-xs btn-outline gap-1"
+              >
+                <.icon name="hero-paper-clip" class="w-3.5 h-3.5" />
+                {link.artifact_name}
+              </a>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

@@ -6,6 +6,9 @@ defmodule MisRedesSociales.Links do
     resource MisRedesSociales.Links.Link do
       define(:create_link, action: :create)
       define(:list_links, action: :list_recent)
+      define(:get_link, action: :read, get_by: [:id])
+      define(:update_link, action: :update)
+      define(:destroy_link, action: :destroy)
     end
 
     resource MisRedesSociales.Links.Category do

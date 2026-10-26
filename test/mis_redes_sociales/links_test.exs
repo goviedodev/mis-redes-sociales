@@ -81,4 +81,39 @@ defmodule MisRedesSociales.LinksTest do
              & &1.id
            ) == [link2.id]
   end
+
+  test "updates an existing link's fields and destroys a link" do
+    {:ok, link} =
+      Links.create_link(%{
+        category: "IA",
+        subcategory: "OCR",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/watch?v=1",
+        short_description: "Descripción inicial",
+        long_description: "Detalle inicial"
+      })
+
+    assert {:ok, updated} =
+             Links.update_link(link, %{
+               category: "Programación",
+               subcategory: "Elixir",
+               link_type: "TikTok",
+               url: "https://www.tiktok.com/@user/video/99",
+               short_description: "Descripción actualizada",
+               long_description: "Detalle actualizado"
+             })
+
+    assert updated.category == "Programación"
+    assert updated.subcategory == "Elixir"
+    assert updated.link_type == "TikTok"
+    assert updated.url == "https://www.tiktok.com/@user/video/99"
+    assert updated.short_description == "Descripción actualizada"
+    assert updated.long_description == "Detalle actualizado"
+
+    assert {:ok, fetched} = Links.get_link(link.id)
+    assert fetched.short_description == "Descripción actualizada"
+
+    assert :ok = Links.destroy_link(updated)
+    assert Links.list_links!() == []
+  end
 end

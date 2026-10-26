@@ -12,6 +12,22 @@ defmodule MisRedesSociales.Links.Link do
   actions do
     defaults([:read])
 
+    destroy :destroy do
+      primary?(true)
+      require_atomic?(false)
+
+      change(
+        after_action(fn _changeset, record, _context ->
+          if record.artifact_path do
+            artifacts_dir = Application.get_env(:mis_redes_sociales, :artifacts_dir, "artifacts")
+            File.rm(Path.join(artifacts_dir, Path.basename(record.artifact_path)))
+          end
+
+          {:ok, record}
+        end)
+      )
+    end
+
     create :create do
       primary?(true)
 
@@ -24,6 +40,20 @@ defmodule MisRedesSociales.Links.Link do
         :long_description,
         :artifact_name,
         :artifact_path
+      ])
+    end
+
+    update :update do
+      primary?(true)
+      require_atomic?(false)
+
+      accept([
+        :category,
+        :subcategory,
+        :link_type,
+        :url,
+        :short_description,
+        :long_description
       ])
     end
 
