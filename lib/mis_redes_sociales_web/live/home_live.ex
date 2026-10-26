@@ -23,7 +23,8 @@ defmodule MisRedesSocialesWeb.HomeLive do
        filters: @default_filters,
        filter_form: to_form(@default_filters, as: :filter),
        editing_link_id: nil,
-       edit_form: nil
+       edit_form: nil,
+       deleting_link: nil
      )
      |> allow_upload(:artifact, accept: :any, max_entries: 1, max_file_size: 20_000_000)
      |> assign_new_form()
@@ -100,9 +101,22 @@ defmodule MisRedesSocialesWeb.HomeLive do
 
   def handle_event("delete_link", %{"id" => id}, socket) do
     link = Links.get_link!(id)
+
+    {:noreply, assign(socket, :deleting_link, link)}
+  end
+
+  def handle_event("cancel_delete", _params, socket) do
+    {:noreply, assign(socket, :deleting_link, nil)}
+  end
+
+  def handle_event("confirm_delete", _params, socket) do
+    link = socket.assigns.deleting_link
     :ok = Links.destroy_link!(link)
 
-    {:noreply, stream_delete(socket, :links, link)}
+    {:noreply,
+     socket
+     |> assign(:deleting_link, nil)
+     |> stream_delete(:links, link)}
   end
 
   def handle_event("validate", %{"form" => params}, socket) do

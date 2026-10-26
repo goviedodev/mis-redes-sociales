@@ -392,7 +392,34 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     assert has_element?(view, "#links", "Nota actualizada")
   end
 
-  test "deleting a saved link in the Enlaces Guardados tab removes it from the list and cleans up its artifact file",
+  test "clicking delete opens confirmation dialog and canceling keeps the saved link intact",
+       %{conn: conn} do
+    {:ok, link} =
+      MisRedesSociales.Links.create_link(%{
+        category: "IA",
+        link_type: "Youtube",
+        url: "https://www.youtube.com/watch?v=keep",
+        short_description: "Enlace a conservar"
+      })
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+    view |> element("#tab-saved") |> render_click()
+
+    refute has_element?(view, "#delete-confirm-modal")
+
+    view |> element("#delete-link-#{link.id}") |> render_click()
+
+    assert has_element?(view, "#delete-confirm-modal")
+    assert has_element?(view, "#links", "Enlace a conservar")
+
+    view |> element("#cancel-delete-link") |> render_click()
+
+    refute has_element?(view, "#delete-confirm-modal")
+    assert has_element?(view, "#links", "Enlace a conservar")
+    assert length(MisRedesSociales.Links.list_links!()) == 1
+  end
+
+  test "accepting the delete confirmation dialog removes the saved link and cleans up its artifact file",
        %{conn: conn} do
     artifacts_dir = Application.get_env(:mis_redes_sociales, :artifacts_dir, "artifacts")
     File.mkdir_p!(artifacts_dir)
@@ -417,7 +444,11 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     assert File.exists?(artifact_full_path)
 
     view |> element("#delete-link-#{link.id}") |> render_click()
+    assert has_element?(view, "#delete-confirm-modal")
 
+    view |> element("#confirm-delete-link") |> render_click()
+
+    refute has_element?(view, "#delete-confirm-modal")
     refute has_element?(view, "#links", "Enlace por eliminar")
     assert MisRedesSociales.Links.list_links!() == []
     refute File.exists?(artifact_full_path)

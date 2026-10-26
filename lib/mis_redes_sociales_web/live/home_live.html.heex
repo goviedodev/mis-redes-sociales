@@ -255,6 +255,33 @@
           <% end %>
         </div>
       </div>
+
+      <dialog :if={@deleting_link} id="delete-confirm-modal" class="modal modal-open">
+        <div class="modal-box space-y-4">
+          <h3 class="text-lg font-bold">Confirmar eliminación</h3>
+          <p class="text-sm">
+            ¿Estás seguro de que deseas eliminar <strong>{@deleting_link.short_description}</strong>?
+          </p>
+          <div class="modal-action">
+            <button
+              type="button"
+              id="cancel-delete-link"
+              phx-click="cancel_delete"
+              class="btn btn-ghost btn-sm"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              id="confirm-delete-link"
+              phx-click="confirm_delete"
+              class="btn btn-error btn-sm"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      </dialog>
     </div>
   </div>
 </Layouts.app>
