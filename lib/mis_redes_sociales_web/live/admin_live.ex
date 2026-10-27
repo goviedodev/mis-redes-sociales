@@ -8,12 +8,14 @@ defmodule MisRedesSocialesWeb.AdminLive do
   @impl true
   def mount(_params, _session, socket) do
     categories = Links.list_categories!()
+    backups = Backups.list_backups()
 
     {:ok,
      socket
      |> assign(page_title: "Administración")
      |> assign_new_form()
-     |> stream(:categories, categories)}
+     |> stream(:categories, categories)
+     |> stream(:backups, backups)}
   end
 
   @impl true
@@ -43,9 +45,12 @@ defmodule MisRedesSocialesWeb.AdminLive do
   def handle_event("create_backup", _params, socket) do
     case Backups.create_backup() do
       {:ok, backup_path} ->
+        backups = Backups.list_backups()
+
         {:noreply,
-         put_flash(
-           socket,
+         socket
+         |> stream(:backups, backups, reset: true)
+         |> put_flash(
            :info,
            "Respaldo creado correctamente (#{Path.basename(backup_path)})"
          )}
@@ -53,6 +58,10 @@ defmodule MisRedesSocialesWeb.AdminLive do
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "No se pudo crear el respaldo")}
     end
+  end
+
+  def format_size(bytes) when is_integer(bytes) do
+    "#{Float.round(bytes / 1024, 1)} KB"
   end
 
   defp assign_new_form(socket) do

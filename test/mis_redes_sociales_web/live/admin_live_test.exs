@@ -82,4 +82,38 @@ defmodule MisRedesSocialesWeb.AdminLiveTest do
     assert String.starts_with?(backup_file, "backup_")
     assert String.ends_with?(backup_file, ".db")
   end
+
+  test "renders empty backups state on /admin and updates the backups list with download links when backups exist or are created",
+       %{conn: conn} do
+    tmp_dir =
+      Path.join(
+        System.tmp_dir!(),
+        "mrs_admin_backups_list_#{System.unique_integer([:positive])}"
+      )
+
+    previous_dir = Application.get_env(:mis_redes_sociales, :backups_dir)
+    Application.put_env(:mis_redes_sociales, :backups_dir, tmp_dir)
+
+    on_exit(fn ->
+      if previous_dir do
+        Application.put_env(:mis_redes_sociales, :backups_dir, previous_dir)
+      else
+        Application.delete_env(:mis_redes_sociales, :backups_dir)
+      end
+
+      File.rm_rf!(tmp_dir)
+    end)
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/admin")
+
+    assert has_element?(view, "#backups-empty", "No hay respaldos disponibles aún.")
+
+    view
+    |> element("#create-backup-btn")
+    |> render_click()
+
+    assert [backup_file] = File.ls!(tmp_dir)
+    assert has_element?(view, "#backups", backup_file)
+    assert has_element?(view, "a[href='/backups/#{backup_file}']", "Descargar")
+  end
 end

@@ -62,6 +62,29 @@
       >
         <.icon name="hero-circle-stack" class="w-4 h-4" /> Crear Respaldo Ahora
       </button>
+
+      <div id="backups" phx-update="stream" class="space-y-2 pt-2">
+        <div id="backups-empty" class="hidden only:block text-sm opacity-60 py-2 text-center">
+          No hay respaldos disponibles aún.
+        </div>
+        <div
+          :for={{id, backup} <- @streams.backups}
+          id={id}
+          class="card bg-base-100 p-3 rounded-xl shadow-xs flex flex-row items-center justify-between gap-2"
+        >
+          <div class="min-w-0">
+            <p class="font-medium text-sm truncate">{backup.filename}</p>
+            <p class="text-xs opacity-60">{format_size(backup.size_bytes)}</p>
+          </div>
+          <a
+            href={"/backups/#{backup.filename}"}
+            download={backup.filename}
+            class="btn btn-outline btn-xs shrink-0"
+          >
+            <.icon name="hero-arrow-down-tray" class="w-3.5 h-3.5" /> Descargar
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </Layouts.app>

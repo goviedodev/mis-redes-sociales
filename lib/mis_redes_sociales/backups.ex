@@ -34,4 +34,29 @@ defmodule MisRedesSociales.Backups do
       {:ok, dest_path}
     end
   end
+
+  def list_backups(opts \\ []) do
+    dir = Keyword.get(opts, :backups_dir, backups_dir())
+
+    case File.ls(dir) do
+      {:ok, entries} ->
+        entries
+        |> Enum.filter(&(String.starts_with?(&1, "backup_") and String.ends_with?(&1, ".db")))
+        |> Enum.sort(:desc)
+        |> Enum.flat_map(fn filename ->
+          path = Path.join(dir, filename)
+
+          case File.stat(path) do
+            {:ok, %File.Stat{type: :regular, size: size}} ->
+              [%{id: filename, filename: filename, size_bytes: size}]
+
+            _ ->
+              []
+          end
+        end)
+
+      {:error, _} ->
+        []
+    end
+  end
 end

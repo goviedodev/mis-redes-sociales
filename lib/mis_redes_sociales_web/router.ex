@@ -31,6 +31,7 @@ defmodule MisRedesSocialesWeb.Router do
     pipe_through [:browser, :require_pin]
 
     get "/artifacts/:filename", ArtifactController, :show
+    get "/backups/:filename", BackupController, :show
 
     live_session :authenticated,
       on_mount: [{MisRedesSocialesWeb.PinAuth, :ensure_unlocked}] do

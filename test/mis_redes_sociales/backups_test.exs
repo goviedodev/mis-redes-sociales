@@ -35,4 +35,29 @@ defmodule MisRedesSociales.BackupsTest do
       Repo.delete_all("categories")
     end)
   end
+
+  test "lists backup files sorted from newest to oldest with filename and size, and returns empty list when directory has no backups" do
+    tmp_dir =
+      Path.join(System.tmp_dir!(), "mrs_backups_list_#{System.unique_integer([:positive])}")
+
+    on_exit(fn -> File.rm_rf!(tmp_dir) end)
+
+    assert Backups.list_backups(backups_dir: tmp_dir) == []
+
+    {:ok, _older} =
+      Backups.create_backup(backups_dir: tmp_dir, now: ~U[2026-10-26 04:00:00Z])
+
+    {:ok, _newer} =
+      Backups.create_backup(backups_dir: tmp_dir, now: ~U[2026-10-27 04:00:00Z])
+
+    # Ignore unrelated files in the directory
+    File.write!(Path.join(tmp_dir, "ignore.txt"), "not a db")
+
+    assert [first, second] = Backups.list_backups(backups_dir: tmp_dir)
+    assert first.filename == "backup_2026-10-27_01-00-00.db"
+    assert first.id == "backup_2026-10-27_01-00-00.db"
+    assert first.size_bytes > 0
+    assert second.filename == "backup_2026-10-26_01-00-00.db"
+    assert second.size_bytes > 0
+  end
 end
