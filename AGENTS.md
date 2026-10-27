@@ -16,6 +16,7 @@ Always consult these project documents before planning, coding, or deploying:
 - **Product Requirements & Technical Specs:** [PRD.md](./PRD.md)
 - **Project Backlog & Stack:** [backlog.md](./backlog.md)
 - **Development & Production (`asus`) Environments:** [PROJECT-ENVIRONMENT.md](./PROJECT-ENVIRONMENT.md)
+- **Technical Learnings & PWA Architecture:** [LEARNINGS.md](./LEARNINGS.md)
 - **Git & PR Workflow Skill:** [.agents/skills/git-workflow/SKILL.md](./.agents/skills/git-workflow/SKILL.md)
 
 ## Skill Routing Rules
