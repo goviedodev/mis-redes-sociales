@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    container_name: mis-redes-sociales
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - TZ=America/Santiago
+      - PHX_SERVER=true
+      - PHX_HOST=${PHX_HOST:-redesgo.sevenit.cl}
+      - PORT=4000
+      - DATABASE_PATH=/app/data/mis_redes_sociales.db
+      - ARTIFACTS_DIR=/app/artifacts
+      - BACKUPS_DIR=/app/backups
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE:-f8K9mP2vL5nQ8rT1wY4zB7cE0gH3jK6mN9pQ2sV5xZ8aD1fG4hJ7kL0nP3qR6tU9}
+    volumes:
+      - ./data:/app/data
+      - ./artifacts:/app/artifacts
+      - ./backups:/app/backups
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: mis-redes-sociales-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    volumes:
+      - ./cloudflared:/etc/cloudflared
+    depends_on:
+      - app

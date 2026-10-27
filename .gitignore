@@ -39,7 +39,11 @@ npm-debug.log
 *.db
 *.db-*
 
-# Uploaded artifacts
+# Uploaded artifacts and runtime volumes
 /artifacts/*
 !/artifacts/.gitkeep
+/data/
+/backups/
+/cloudflared/
+*.swp
 

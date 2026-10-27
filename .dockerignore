@@ -1,0 +1,13 @@
+_build/
+deps/
+.git/
+.gitignore
+*.db
+*.db-shm
+*.db-wal
+*.swp
+artifacts/
+backups/
+data/
+cloudflared/
+test/

@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+
+cd -P -- "$(dirname -- "$0")"
+exec ./mis_redes_sociales eval MisRedesSociales.Release.migrate
