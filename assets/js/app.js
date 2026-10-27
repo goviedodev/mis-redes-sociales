@@ -25,11 +25,44 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/mis_redes_sociales"
 import topbar from "../vendor/topbar"
 
+// Notifica al servidor cuando el prompt de instalación está disponible/no disponible
+const PWAInstall = {
+  mounted() {
+    this.handleInstallReady = (e) => {
+      this.pushEvent("pwa_install_ready", { ready: !!e.detail })
+    }
+    globalThis.addEventListener("pwa:install-ready", this.handleInstallReady)
+
+    if (globalThis.deferredPrompt) {
+      this.pushEvent("pwa_install_ready", { ready: true })
+    }
+  },
+  destroyed() {
+    globalThis.removeEventListener("pwa:install-ready", this.handleInstallReady)
+  }
+}
+
+// Hook para el botón de instalación: dispara .prompt() en el mismo tick del click,
+// sin round-trip al servidor, preservando el contexto de gesto de usuario de Chrome.
+const PWAInstallBtn = {
+  mounted() {
+    this.el.addEventListener("click", () => {
+      if (!globalThis.deferredPrompt) return
+      const prompt = globalThis.deferredPrompt
+      globalThis.deferredPrompt = null
+      prompt.prompt()
+      prompt.userChoice.then(() => {
+        globalThis.dispatchEvent(new CustomEvent("pwa:install-ready", { detail: false }))
+      })
+    })
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {PWAInstall, PWAInstallBtn, ...colocatedHooks},
 })
 
 // Show progress bar on live navigation and form submits
@@ -40,11 +73,34 @@ window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 
+// Registro del Service Worker para habilitar la instalación de la PWA
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {})
+  globalThis.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then((registration) => {
+        console.log("Service Worker registrado con éxito: ", registration.scope)
+      })
+      .catch((error) => {
+        console.error("Fallo al registrar el Service Worker: ", error)
+      })
   })
 }
+
+// Lógica para capturar y manejar el prompt de instalación de PWA
+globalThis.deferredPrompt = null
+
+globalThis.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault()
+  globalThis.deferredPrompt = e
+  globalThis.dispatchEvent(new CustomEvent("pwa:install-ready", { detail: true }))
+})
+
+globalThis.addEventListener("appinstalled", () => {
+  globalThis.deferredPrompt = null
+  globalThis.dispatchEvent(new CustomEvent("pwa:install-ready", { detail: false }))
+  console.log("PWA fue instalada con éxito")
+})
 
 // expose liveSocket on window for web console debug logs and latency simulation:
 // >> liveSocket.enableDebug()

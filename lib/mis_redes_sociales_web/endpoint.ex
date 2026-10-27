@@ -25,7 +25,7 @@ defmodule MisRedesSocialesWeb.Endpoint do
     from: :mis_redes_sociales,
     gzip: not code_reloading?,
     only: MisRedesSocialesWeb.static_paths(),
-    only_matching: ~w(favicon robots manifest sw),
+    only_matching: ~w(favicon robots manifest service-worker sw),
     raise_on_missing_only: code_reloading?
 
   # Code reloading can be explicitly enabled under the

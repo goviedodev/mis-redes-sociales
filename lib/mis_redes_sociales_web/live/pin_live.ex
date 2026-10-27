@@ -5,7 +5,18 @@ defmodule MisRedesSocialesWeb.PinLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, page_title: "Ingresa tu PIN", digits: [], error: nil)}
+    {:ok,
+     assign(socket,
+       page_title: "Ingresa tu PIN",
+       digits: [],
+       error: nil,
+       show_install_prompt: false
+     )}
+  end
+
+  @impl true
+  def handle_event("pwa_install_ready", %{"ready" => ready}, socket) do
+    {:noreply, assign(socket, show_install_prompt: ready)}
   end
 
   @impl true

@@ -1,5 +1,9 @@
 <Layouts.app flash={@flash}>
-  <div class="mx-auto max-w-xs py-8 flex flex-col items-center gap-6">
+  <div
+    id="pin-pwa-container"
+    phx-hook="PWAInstall"
+    class="mx-auto max-w-xs py-8 flex flex-col items-center gap-6"
+  >
     <div class="text-center space-y-1">
       <h1 class="text-2xl font-bold">Ingresa tu PIN</h1>
       <p class="text-sm opacity-70">Marca los 4 dígitos para desbloquear</p>
@@ -53,5 +57,18 @@
         Borrar
       </button>
     </div>
+
+    <%= if @show_install_prompt do %>
+      <div class="fixed bottom-6 left-0 right-0 px-4 z-50 flex justify-center">
+        <button
+          id="pwa-install-btn"
+          type="button"
+          phx-hook="PWAInstallBtn"
+          class="btn btn-primary w-full max-w-xs shadow-lg shadow-primary/30 flex items-center gap-2"
+        >
+          <.icon name="hero-arrow-down-tray" class="w-5 h-5" /> Instalar App
+        </button>
+      </div>
+    <% end %>
   </div>
 </Layouts.app>

@@ -24,7 +24,8 @@ defmodule MisRedesSocialesWeb.HomeLive do
        filter_form: to_form(@default_filters, as: :filter),
        editing_link_id: nil,
        edit_form: nil,
-       deleting_link: nil
+       deleting_link: nil,
+       show_install_prompt: false
      )
      |> allow_upload(:artifact, accept: :any, max_entries: 1, max_file_size: 20_000_000)
      |> assign_new_form()
@@ -32,6 +33,10 @@ defmodule MisRedesSocialesWeb.HomeLive do
   end
 
   @impl true
+  def handle_event("pwa_install_ready", %{"ready" => ready}, socket) do
+    {:noreply, assign(socket, show_install_prompt: ready)}
+  end
+
   def handle_event("switch_tab", %{"tab" => tab}, socket) when tab in ["new", "saved"] do
     {:noreply, assign(socket, :active_tab, tab)}
   end

@@ -1,5 +1,5 @@
 <Layouts.app flash={@flash}>
-  <div class="space-y-8">
+  <div id="home-pwa-container" phx-hook="PWAInstall" class="space-y-8">
     <div class="flex items-center justify-between gap-2">
       <div class="space-y-1">
         <h1 class="text-2xl font-bold">Mis Redes Sociales</h1>
@@ -283,5 +283,18 @@
         </div>
       </dialog>
     </div>
+
+    <%= if @show_install_prompt do %>
+      <div class="fixed bottom-6 left-0 right-0 px-4 z-50 flex justify-center">
+        <button
+          id="pwa-install-btn"
+          type="button"
+          phx-hook="PWAInstallBtn"
+          class="btn btn-primary w-full max-w-xs shadow-lg shadow-primary/30 flex items-center gap-2"
+        >
+          <.icon name="hero-arrow-down-tray" class="w-5 h-5" /> Instalar App
+        </button>
+      </div>
+    <% end %>
   </div>
 </Layouts.app>
