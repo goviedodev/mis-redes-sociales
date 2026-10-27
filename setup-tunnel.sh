@@ -23,9 +23,11 @@ chmod 777 "$CRED_DIR"
 TUNNEL_NAME="${TUNNEL_NAME:-mis-redes-sociales}"
 DOMAIN="${DOMAIN:-redesgo.sevenit.cl}"
 
-if [ ! -f "$CRED_DIR/cert.pem" ] && [ -f "$HOME/servicios/htmls-info/cloudflared/cert.pem" ]; then
-  cp "$HOME/servicios/htmls-info/cloudflared/cert.pem" "$CRED_DIR/cert.pem"
-  chmod 644 "$CRED_DIR/cert.pem"
+if [ ! -f "$CRED_DIR/cert.pem" ] && [ -d "$HOME/servicios/htmls-info/cloudflared" ]; then
+  docker run --rm \
+    -v "$HOME/servicios/htmls-info/cloudflared":/src:ro \
+    -v "$CRED_DIR":/dst \
+    alpine sh -c "if [ -f /src/cert.pem ]; then cp -f /src/cert.pem /dst/cert.pem && chown 65532:65532 /dst/cert.pem && chmod 600 /dst/cert.pem; fi"
   echo "✅ Certificado cert.pem existente copiado desde htmls-info"
 fi
 
