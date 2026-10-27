@@ -46,4 +46,40 @@ defmodule MisRedesSocialesWeb.AdminLiveTest do
     assert dup_html =~ "ya existe"
     assert [%{name: "IA"}] = MisRedesSociales.Links.list_categories!()
   end
+
+  test "clicking 'Crear Respaldo Ahora' on /admin creates a backup file immediately and displays a confirmation message",
+       %{conn: conn} do
+    tmp_dir =
+      Path.join(
+        System.tmp_dir!(),
+        "mrs_admin_backup_test_#{System.unique_integer([:positive])}"
+      )
+
+    previous_dir = Application.get_env(:mis_redes_sociales, :backups_dir)
+    Application.put_env(:mis_redes_sociales, :backups_dir, tmp_dir)
+
+    on_exit(fn ->
+      if previous_dir do
+        Application.put_env(:mis_redes_sociales, :backups_dir, previous_dir)
+      else
+        Application.delete_env(:mis_redes_sociales, :backups_dir)
+      end
+
+      File.rm_rf!(tmp_dir)
+    end)
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/admin")
+
+    assert has_element?(view, "#create-backup-btn", "Crear Respaldo Ahora")
+
+    html =
+      view
+      |> element("#create-backup-btn")
+      |> render_click()
+
+    assert html =~ "Respaldo creado correctamente"
+    assert [backup_file] = File.ls!(tmp_dir)
+    assert String.starts_with?(backup_file, "backup_")
+    assert String.ends_with?(backup_file, ".db")
+  end
 end

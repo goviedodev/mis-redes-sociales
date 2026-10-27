@@ -15,8 +15,7 @@ defmodule MisRedesSociales.Application do
       {DNSCluster,
        query: Application.get_env(:mis_redes_sociales, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: MisRedesSociales.PubSub},
-      # Start a worker by calling: MisRedesSociales.Worker.start_link(arg)
-      # {MisRedesSociales.Worker, arg},
+      MisRedesSociales.BackupScheduler,
       # Start to serve requests, typically the last entry
       MisRedesSocialesWeb.Endpoint
     ]

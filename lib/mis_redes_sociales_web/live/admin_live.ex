@@ -1,6 +1,7 @@
 defmodule MisRedesSocialesWeb.AdminLive do
   use MisRedesSocialesWeb, :live_view
 
+  alias MisRedesSociales.Backups
   alias MisRedesSociales.Links
   alias MisRedesSociales.Links.Category
 
@@ -36,6 +37,21 @@ defmodule MisRedesSocialesWeb.AdminLive do
 
       {:error, form} ->
         {:noreply, assign(socket, :form, to_form(form, as: "form"))}
+    end
+  end
+
+  def handle_event("create_backup", _params, socket) do
+    case Backups.create_backup() do
+      {:ok, backup_path} ->
+        {:noreply,
+         put_flash(
+           socket,
+           :info,
+           "Respaldo creado correctamente (#{Path.basename(backup_path)})"
+         )}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "No se pudo crear el respaldo")}
     end
   end
 

@@ -15,5 +15,7 @@ Expensive decisions: none (single-user PIN access, Spanish-only, installable PWA
 9. ✅ As a user, I want to see a confirmation dialog before deleting a saved link and only delete it when I press accept, so that I don't accidentally remove a link. Requires: #8
 10. As a user, I want to switch between 3 visual themes, so that I can read and use the app comfortably in different lighting conditions. Requires: #1
 11. ✅ As a user, I want to install the web app on my phone or computer as a PWA, so that I can launch it directly from my home screen like a native app. Requires: #1
-12. As a user, I want my database to be automatically backed up every day at 1:00 AM (`America/Santiago`), so that I never lose my saved collection. Requires: #2
+12. ✅ As a user, I want my database to be automatically backed up every day at 1:00 AM (`America/Santiago`) and to trigger a manual backup from `/admin`, so that I can secure my saved collection at any time. Requires: #2
 13. ✅ As a user, I want to run the complete application with Docker Compose, so that it runs reliably on my Asus home network computer with persistent database and artifacts. Requires: #2
+14. As a user, I want to see the list of database backups on `/admin` and download any backup file to my device, so that I can verify and keep external copies of my database. Requires: #12
+15. As a user, I want to restore or delete a database backup from `/admin` after accepting a confirmation dialog, so that I can recover my collection to a previous state or remove old backups safely. Requires: #14
