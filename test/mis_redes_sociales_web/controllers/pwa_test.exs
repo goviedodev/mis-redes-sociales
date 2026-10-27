@@ -13,6 +13,15 @@ defmodule MisRedesSocialesWeb.PwaTest do
     assert html =~ ~s(name="mobile-web-app-capable")
     assert html =~ ~s(rel="apple-touch-icon")
     assert html =~ ~s(href="/images/icon-192.png")
+
+    root_source =
+      File.read!("lib/mis_redes_sociales_web/components/layouts/root.html.heex")
+
+    refute root_source =~ ~s(~p"/manifest.webmanifest")
+    assert root_source =~ ~s(href="/manifest.webmanifest")
+
+    endpoint_source = File.read!("lib/mis_redes_sociales_web/endpoint.ex")
+    assert endpoint_source =~ "only_matching:"
   end
 
   test "serves a valid web app manifest at /manifest.webmanifest with standalone display and icons",
