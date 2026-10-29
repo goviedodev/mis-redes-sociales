@@ -19,6 +19,7 @@ defmodule MisRedesSocialesWeb.HomeLive do
        link_types: link_types,
        categories: categories,
        active_tab: "saved",
+       show_filters: false,
        filters: @default_filters,
        filter_form: to_form(@default_filters, as: :filter),
        editing_link_id: nil,
@@ -38,6 +39,10 @@ defmodule MisRedesSocialesWeb.HomeLive do
 
   def handle_event("switch_tab", %{"tab" => tab}, socket) when tab in ["new", "saved"] do
     {:noreply, assign(socket, :active_tab, tab)}
+  end
+
+  def handle_event("toggle_filters", _params, socket) do
+    {:noreply, assign(socket, :show_filters, !socket.assigns.show_filters)}
   end
 
   def handle_event("filter", %{"filter" => filter_params}, socket) do
@@ -124,6 +129,8 @@ defmodule MisRedesSocialesWeb.HomeLive do
   end
 
   def handle_event("validate", %{"form" => params}, socket) do
+    params = maybe_detect_link_type(params, socket.assigns.link_types)
+
     form =
       AshPhoenix.Form.validate(socket.assigns.form.source, params)
       |> to_form(as: "form")
@@ -184,5 +191,23 @@ defmodule MisRedesSocialesWeb.HomeLive do
       |> to_form()
 
     assign(socket, :form, form)
+  end
+
+  defp maybe_detect_link_type(params, link_types) do
+    url = params |> Map.get("url", "") |> to_string() |> String.downcase()
+
+    matched_type =
+      Enum.find(link_types, fn type ->
+        downcased_type = String.downcase(type)
+
+        (downcased_type != "" and String.contains?(url, downcased_type)) or
+          (downcased_type == "youtube" and String.contains?(url, "youtu.be"))
+      end)
+
+    if matched_type do
+      Map.put(params, "link_type", matched_type)
+    else
+      params
+    end
   end
 end

@@ -510,4 +510,66 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     assert has_element?(view, "#links", "Post de LinkedIn")
     assert has_element?(view, "#links", "LinkedIn")
   end
+
+  test "collapses the filter panel by default in Enlaces Guardados and toggles its visibility when clicking the filters accordion button",
+       %{conn: conn} do
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    assert has_element?(view, "#toggle-filters")
+    assert has_element?(view, "#filters-panel.hidden")
+
+    view |> element("#toggle-filters") |> render_click()
+    assert has_element?(view, "#filters-panel:not(.hidden)")
+
+    view |> element("#toggle-filters") |> render_click()
+    assert has_element?(view, "#filters-panel.hidden")
+  end
+
+  test "typing or pasting a URL in Nuevo Enlace automatically selects the matching link type and updates it when the URL changes",
+       %{conn: conn} do
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view
+    |> form("#link-form", form: %{url: "https://www.instagram.com/reel/abc123"})
+    |> render_change()
+
+    assert has_element?(
+             view,
+             "#link-form select[name='form[link_type]'] option[value='Instagram'][selected]"
+           )
+
+    view
+    |> form("#link-form", form: %{url: "https://www.facebook.com/watch/?v=456"})
+    |> render_change()
+
+    assert has_element?(
+             view,
+             "#link-form select[name='form[link_type]'] option[value='Facebook'][selected]"
+           )
+
+    view
+    |> form("#link-form", form: %{url: "https://youtu.be/xyz789"})
+    |> render_change()
+
+    assert has_element?(
+             view,
+             "#link-form select[name='form[link_type]'] option[value='Youtube'][selected]"
+           )
+  end
+
+  test "typing a URL that does not match any link type preserves the manually selected link type",
+       %{conn: conn} do
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view
+    |> form("#link-form",
+      form: %{link_type: "TikTok", url: "https://miweb.cl/articulo-interesante"}
+    )
+    |> render_change()
+
+    assert has_element?(
+             view,
+             "#link-form select[name='form[link_type]'] option[value='TikTok'][selected]"
+           )
+  end
 end

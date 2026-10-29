@@ -94,9 +94,28 @@
     </div>
 
     <div id="saved-links-panel" class={["space-y-4", @active_tab != "saved" && "hidden"]}>
-      <h2 class="text-lg font-semibold">Enlaces Guardados</h2>
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-lg font-semibold">Enlaces Guardados</h2>
+        <button
+          type="button"
+          id="toggle-filters"
+          phx-click="toggle_filters"
+          aria-expanded={to_string(@show_filters)}
+          class="btn btn-outline btn-sm gap-1.5"
+        >
+          <.icon name="hero-funnel" class="w-4 h-4" />
+          <span>Filtros</span>
+          <.icon
+            name={if(@show_filters, do: "hero-chevron-up", else: "hero-chevron-down")}
+            class="w-3.5 h-3.5"
+          />
+        </button>
+      </div>
 
-      <div class="card bg-base-200 p-3 rounded-xl shadow-xs">
+      <div
+        id="filters-panel"
+        class={["card bg-base-200 p-3 rounded-xl shadow-xs", !@show_filters && "hidden"]}
+      >
         <.form for={@filter_form} id="filter-form" phx-change="filter" class="space-y-2">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <.input
