@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between gap-2">
       <div class="space-y-1">
         <h1 class="text-2xl font-bold">Administración</h1>
-        <p class="text-sm opacity-75">Gestiona las categorías de tus enlaces</p>
+        <p class="text-sm opacity-75">Gestiona categorías, tipos de enlace y respaldos</p>
       </div>
       <.link navigate={~p"/"} id="back-to-home" class="btn btn-ghost btn-sm">
         <.icon name="hero-arrow-left" class="w-4 h-4" /> Volver
@@ -47,6 +47,100 @@
       </div>
     </div>
 
+    <div class="card bg-base-200 p-4 rounded-2xl shadow-sm">
+      <h2 class="text-lg font-semibold mb-3">Nuevo Tipo de Enlace</h2>
+      <.form
+        for={@link_type_form}
+        id="link-type-form"
+        phx-change="validate_link_type"
+        phx-submit="save_link_type"
+        class="space-y-3"
+      >
+        <.input
+          field={@link_type_form[:name]}
+          type="text"
+          label="Nombre de Tipo de Enlace"
+          placeholder="Ej. LinkedIn"
+        />
+        <button id="submit-link-type" type="submit" class="btn btn-primary w-full">
+          Crear Tipo de Enlace
+        </button>
+      </.form>
+    </div>
+
+    <div class="space-y-3">
+      <h2 class="text-lg font-semibold">Tipos de Enlace</h2>
+      <div id="link-types" phx-update="stream" class="space-y-2">
+        <div id="link-types-empty" class="hidden only:block text-sm opacity-60 py-4 text-center">
+          No hay tipos de enlace creados aún.
+        </div>
+        <div
+          :for={{id, link_type} <- @streams.link_types}
+          id={id}
+          class="card bg-base-200 p-3 rounded-xl shadow-xs space-y-2"
+        >
+          <%= if @editing_link_type_id == link_type.id do %>
+            <.form
+              for={@edit_link_type_form}
+              id={"edit-link-type-form-#{link_type.id}"}
+              phx-submit="save_link_type_edit"
+              class="space-y-3"
+            >
+              <.input
+                field={@edit_link_type_form[:name]}
+                type="text"
+                label="Nombre de Tipo de Enlace"
+              />
+              <div class="flex justify-end gap-2">
+                <button
+                  type="button"
+                  id={"cancel-edit-link-type-#{link_type.id}"}
+                  phx-click="cancel_link_type_edit"
+                  phx-value-id={link_type.id}
+                  class="btn btn-ghost btn-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  id={"save-edit-link-type-#{link_type.id}"}
+                  class="btn btn-primary btn-sm"
+                >
+                  Guardar cambios
+                </button>
+              </div>
+            </.form>
+          <% else %>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-medium text-base">{link_type.name}</span>
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  id={"edit-link-type-#{link_type.id}"}
+                  phx-click="edit_link_type"
+                  phx-value-id={link_type.id}
+                  class="btn btn-ghost btn-xs"
+                  aria-label="Editar tipo de enlace"
+                >
+                  <.icon name="hero-pencil-square" class="w-4 h-4" /> Editar
+                </button>
+                <button
+                  type="button"
+                  id={"delete-link-type-#{link_type.id}"}
+                  phx-click="delete_link_type"
+                  phx-value-id={link_type.id}
+                  class="btn btn-ghost btn-xs text-error"
+                  aria-label="Eliminar tipo de enlace"
+                >
+                  <.icon name="hero-trash" class="w-4 h-4" /> Eliminar
+                </button>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
     <div class="card bg-base-200 p-4 rounded-2xl shadow-sm space-y-3">
       <div class="space-y-1">
         <h2 class="text-lg font-semibold">Respaldos de Base de Datos</h2>
@@ -70,21 +164,122 @@
         <div
           :for={{id, backup} <- @streams.backups}
           id={id}
-          class="card bg-base-100 p-3 rounded-xl shadow-xs flex flex-row items-center justify-between gap-2"
+          class="card bg-base-100 p-3 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-2"
         >
           <div class="min-w-0">
             <p class="font-medium text-sm truncate">{backup.filename}</p>
             <p class="text-xs opacity-60">{format_size(backup.size_bytes)}</p>
           </div>
-          <a
-            href={"/backups/#{backup.filename}"}
-            download={backup.filename}
-            class="btn btn-outline btn-xs shrink-0"
-          >
-            <.icon name="hero-arrow-down-tray" class="w-3.5 h-3.5" /> Descargar
-          </a>
+          <div class="flex items-center gap-1 shrink-0">
+            <a
+              href={"/backups/#{backup.filename}"}
+              download={backup.filename}
+              class="btn btn-outline btn-xs"
+            >
+              <.icon name="hero-arrow-down-tray" class="w-3.5 h-3.5" /> Descargar
+            </a>
+            <button
+              type="button"
+              id={"restore-backup-#{backup.filename}"}
+              phx-click="restore_backup"
+              phx-value-filename={backup.filename}
+              class="btn btn-outline btn-warning btn-xs"
+            >
+              <.icon name="hero-arrow-path" class="w-3.5 h-3.5" /> Restaurar
+            </button>
+            <button
+              type="button"
+              id={"delete-backup-#{backup.filename}"}
+              phx-click="delete_backup"
+              phx-value-filename={backup.filename}
+              class="btn btn-outline btn-error btn-xs"
+            >
+              <.icon name="hero-trash" class="w-3.5 h-3.5" /> Eliminar
+            </button>
+          </div>
         </div>
       </div>
     </div>
+
+    <dialog :if={@deleting_link_type} id="delete-link-type-modal" class="modal modal-open">
+      <div class="modal-box space-y-4">
+        <h3 class="text-lg font-bold">Confirmar eliminación de tipo de enlace</h3>
+        <p class="text-sm">
+          ¿Estás seguro de que deseas eliminar el tipo de enlace <strong>{@deleting_link_type.name}</strong>?
+        </p>
+        <div class="modal-action">
+          <button
+            type="button"
+            id="cancel-delete-link-type"
+            phx-click="cancel_delete_link_type"
+            class="btn btn-ghost btn-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            id="confirm-delete-link-type"
+            phx-click="confirm_delete_link_type"
+            class="btn btn-error btn-sm"
+          >
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog :if={@deleting_backup_filename} id="delete-backup-modal" class="modal modal-open">
+      <div class="modal-box space-y-4">
+        <h3 class="text-lg font-bold">Confirmar eliminación de respaldo</h3>
+        <p class="text-sm">
+          ¿Estás seguro de que deseas eliminar el respaldo <strong>{@deleting_backup_filename}</strong>?
+        </p>
+        <div class="modal-action">
+          <button
+            type="button"
+            id="cancel-delete-backup"
+            phx-click="cancel_delete_backup"
+            class="btn btn-ghost btn-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            id="confirm-delete-backup"
+            phx-click="confirm_delete_backup"
+            class="btn btn-error btn-sm"
+          >
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog :if={@restoring_backup_filename} id="restore-backup-modal" class="modal modal-open">
+      <div class="modal-box space-y-4">
+        <h3 class="text-lg font-bold">Confirmar restauración de respaldo</h3>
+        <p class="text-sm">
+          ¿Estás seguro de que deseas restaurar la base de datos desde <strong>{@restoring_backup_filename}</strong>? Los datos actuales serán reemplazados.
+        </p>
+        <div class="modal-action">
+          <button
+            type="button"
+            id="cancel-restore-backup"
+            phx-click="cancel_restore_backup"
+            class="btn btn-ghost btn-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            id="confirm-restore-backup"
+            phx-click="confirm_restore_backup"
+            class="btn btn-warning btn-sm"
+          >
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </dialog>
   </div>
 </Layouts.app>

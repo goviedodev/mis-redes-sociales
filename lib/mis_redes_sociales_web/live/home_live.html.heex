@@ -13,16 +13,6 @@
     <div role="tablist" class="tabs tabs-box grid grid-cols-2">
       <button
         type="button"
-        id="tab-new"
-        role="tab"
-        phx-click="switch_tab"
-        phx-value-tab="new"
-        class={["tab font-medium", @active_tab == "new" && "tab-active"]}
-      >
-        Nuevo Enlace
-      </button>
-      <button
-        type="button"
         id="tab-saved"
         role="tab"
         phx-click="switch_tab"
@@ -30,6 +20,16 @@
         class={["tab font-medium", @active_tab == "saved" && "tab-active"]}
       >
         Enlaces Guardados
+      </button>
+      <button
+        type="button"
+        id="tab-new"
+        role="tab"
+        phx-click="switch_tab"
+        phx-value-tab="new"
+        class={["tab font-medium", @active_tab == "new" && "tab-active"]}
+      >
+        Nuevo Enlace
       </button>
     </div>
 

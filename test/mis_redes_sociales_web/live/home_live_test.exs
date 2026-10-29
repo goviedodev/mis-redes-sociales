@@ -198,19 +198,36 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     refute has_element?(view, "#links [data-role='artifact-link']")
   end
 
-  test "renders Nuevo Enlace and Enlaces Guardados tabs with Nuevo Enlace active by default and Enlaces Guardados panel hidden",
+  test "renders Enlaces Guardados as the first tab and active by default, with Nuevo Enlace second and its panel hidden",
        %{conn: conn} do
     {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    assert has_element?(
+             view,
+             "[role='tablist'] button:first-child#tab-saved.tab-active",
+             "Enlaces Guardados"
+           )
+
+    assert has_element?(
+             view,
+             "[role='tablist'] button:last-child#tab-new:not(.tab-active)",
+             "Nuevo Enlace"
+           )
+
+    assert has_element?(view, "#saved-links-panel:not(.hidden)")
+    assert has_element?(view, "#new-link-panel.hidden")
+  end
+
+  test "clicking Nuevo Enlace and Enlaces Guardados tabs switches the visible panel",
+       %{conn: conn} do
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view |> element("#tab-new") |> render_click()
 
     assert has_element?(view, "#tab-new.tab-active", "Nuevo Enlace")
     assert has_element?(view, "#tab-saved:not(.tab-active)", "Enlaces Guardados")
     assert has_element?(view, "#new-link-panel:not(.hidden)")
     assert has_element?(view, "#saved-links-panel.hidden")
-  end
-
-  test "clicking Enlaces Guardados and Nuevo Enlace tabs switches the visible panel",
-       %{conn: conn} do
-    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
 
     view |> element("#tab-saved") |> render_click()
 
@@ -218,18 +235,14 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     assert has_element?(view, "#tab-new:not(.tab-active)", "Nuevo Enlace")
     assert has_element?(view, "#saved-links-panel:not(.hidden)")
     assert has_element?(view, "#new-link-panel.hidden")
-
-    view |> element("#tab-new") |> render_click()
-
-    assert has_element?(view, "#tab-new.tab-active", "Nuevo Enlace")
-    assert has_element?(view, "#new-link-panel:not(.hidden)")
-    assert has_element?(view, "#saved-links-panel.hidden")
   end
 
   test "saving a valid link automatically switches the active tab to Enlaces Guardados",
        %{conn: conn} do
     {:ok, _} = MisRedesSociales.Links.create_category(%{name: "IA"})
     {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    view |> element("#tab-new") |> render_click()
 
     view
     |> form("#link-form",
@@ -452,5 +465,49 @@ defmodule MisRedesSocialesWeb.HomeLiveTest do
     refute has_element?(view, "#links", "Enlace por eliminar")
     assert MisRedesSociales.Links.list_links!() == []
     refute File.exists?(artifact_full_path)
+  end
+
+  test "renders the 3-theme selector (light, dark, sepia) in the app layout header without English boilerplate links",
+       %{conn: conn} do
+    {:ok, view, html} = live(unlocked_conn(conn), ~p"/")
+
+    assert has_element?(view, "#theme-selector")
+    assert has_element?(view, "#theme-btn-light[data-phx-theme='light']", "Claro")
+    assert has_element?(view, "#theme-btn-dark[data-phx-theme='dark']", "Oscuro")
+    assert has_element?(view, "#theme-btn-sepia[data-phx-theme='sepia']", "Sepia")
+    refute html =~ "Get Started"
+    refute html =~ "Website"
+  end
+
+  test "populates link type dropdowns on the main screen with custom link types created on /admin and allows saving a link with that type",
+       %{conn: conn} do
+    {:ok, _} = MisRedesSociales.Links.create_category(%{name: "Red Profesional"})
+    {:ok, _} = MisRedesSociales.Links.create_link_type(%{name: "LinkedIn"})
+
+    {:ok, view, _html} = live(unlocked_conn(conn), ~p"/")
+
+    assert has_element?(
+             view,
+             "#link-form select[name='form[link_type]'] option[value='LinkedIn']"
+           )
+
+    assert has_element?(
+             view,
+             "#filter-form select[name='filter[link_type]'] option[value='LinkedIn']"
+           )
+
+    view
+    |> form("#link-form",
+      form: %{
+        category: "Red Profesional",
+        link_type: "LinkedIn",
+        url: "https://www.linkedin.com/posts/123",
+        short_description: "Post de LinkedIn"
+      }
+    )
+    |> render_submit()
+
+    assert has_element?(view, "#links", "Post de LinkedIn")
+    assert has_element?(view, "#links", "LinkedIn")
   end
 end

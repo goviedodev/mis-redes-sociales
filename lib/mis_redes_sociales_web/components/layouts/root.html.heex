@@ -21,21 +21,21 @@
     </script>
     <script>
       (() => {
+        const validThemes = ["light", "dark", "sepia"];
         const setTheme = (theme) => {
-          if (theme === "system") {
-            localStorage.removeItem("phx:theme");
-            document.documentElement.removeAttribute("data-theme");
-          } else {
-            localStorage.setItem("phx:theme", theme);
-            document.documentElement.setAttribute("data-theme", theme);
-          }
+          const nextTheme = validThemes.includes(theme) ? theme : "light";
+          localStorage.setItem("phx:theme", nextTheme);
+          document.documentElement.setAttribute("data-theme", nextTheme);
         };
         if (!document.documentElement.hasAttribute("data-theme")) {
-          setTheme(localStorage.getItem("phx:theme") || "system");
+          setTheme(localStorage.getItem("phx:theme") || "light");
         }
-        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        
-        window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
+        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "light"));
+
+        window.addEventListener("phx:set-theme", (e) => {
+          const theme = e.target.closest("[data-phx-theme]")?.dataset.phxTheme || e.target.dataset.phxTheme;
+          if (theme) setTheme(theme);
+        });
       })();
     </script>
   </head>

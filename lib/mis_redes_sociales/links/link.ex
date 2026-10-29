@@ -121,10 +121,6 @@ defmodule MisRedesSociales.Links.Link do
     timestamps(type: :utc_datetime_usec)
   end
 
-  validations do
-    validate(one_of(:link_type, ["Youtube", "Facebook", "Instagram", "TikTok"]))
-  end
-
   defp filter_by_category(query, val) when val in [nil, ""], do: query
 
   defp filter_by_category(query, val) do

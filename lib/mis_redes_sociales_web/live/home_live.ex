@@ -4,22 +4,21 @@ defmodule MisRedesSocialesWeb.HomeLive do
   alias MisRedesSociales.Links
   alias MisRedesSociales.Links.Link
 
-  @link_types ["Youtube", "Facebook", "Instagram", "TikTok"]
-
   @default_filters %{"category" => "", "subcategory" => "", "link_type" => ""}
 
   @impl true
   def mount(_params, _session, socket) do
     links = Links.list_links!()
     categories = Links.list_categories!() |> Enum.map(& &1.name)
+    link_types = Links.list_link_types!() |> Enum.map(& &1.name)
 
     {:ok,
      socket
      |> assign(
        page_title: "Mis Redes Sociales",
-       link_types: @link_types,
+       link_types: link_types,
        categories: categories,
-       active_tab: "new",
+       active_tab: "saved",
        filters: @default_filters,
        filter_form: to_form(@default_filters, as: :filter),
        editing_link_id: nil,

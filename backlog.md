@@ -13,9 +13,13 @@ Expensive decisions: none (single-user PIN access, Spanish-only, installable PWA
 7. ✅ As a user, I want to filter my saved links by category, subcategory, or link type, so that I can quickly find specific links as my collection grows. Requires: #4
 8. ✅ As a user, I want to edit or delete a saved link, so that I can fix mistakes or remove outdated links. Requires: #2
 9. ✅ As a user, I want to see a confirmation dialog before deleting a saved link and only delete it when I press accept, so that I don't accidentally remove a link. Requires: #8
-10. As a user, I want to switch between 3 visual themes, so that I can read and use the app comfortably in different lighting conditions. Requires: #1
+10. ✅ As a user, I want to switch between 3 visual themes, so that I can read and use the app comfortably in different lighting conditions. Requires: #1
 11. ✅ As a user, I want to install the web app on my phone or computer as a PWA, so that I can launch it directly from my home screen like a native app. Requires: #1
 12. ✅ As a user, I want my database to be automatically backed up every day at 1:00 AM (`America/Santiago`) and to trigger a manual backup from `/admin`, so that I can secure my saved collection at any time. Requires: #2
 13. ✅ As a user, I want to run the complete application with Docker Compose, so that it runs reliably on my Asus home network computer with persistent database and artifacts. Requires: #2
 14. ✅ As a user, I want to see the list of database backups on `/admin` and download any backup file to my device, so that I can verify and keep external copies of my database. Requires: #12
-15. As a user, I want to restore or delete a database backup from `/admin` after accepting a confirmation dialog, so that I can recover my collection to a previous state or remove old backups safely. Requires: #14
+15. ✅ As a user, I want to restore or delete a database backup from `/admin` after accepting a confirmation dialog, so that I can recover my collection to a previous state or remove old backups safely. Requires: #14
+16. ✅ As a user, I want to create and view link types on `/admin` (preloaded with `Youtube`, `Facebook`, `Instagram`, and `TikTok`) and select from those link types when saving, editing, or filtering links, so that I am not limited to a hardcoded list of social networks. Requires: #2
+17. ✅ As a user, I want to edit the name of a link type on `/admin` and have all saved links using that type automatically updated to the new name, so that I can rename a link type without breaking existing links. Requires: #16
+18. ✅ As a user, I want to delete an unused link type on `/admin` after accepting a confirmation dialog while blocking deletion if any saved link still uses it, so that I can remove obsolete link types safely without orphaning saved links. Requires: #16
+19. ✅ As a user, I want the "Enlaces Guardados" tab to be the first tab displayed when the application loads (with "Enlaces Guardados" listed before "Nuevo Enlace"), so that I can immediately browse my saved links upon opening the app. Requires: #6

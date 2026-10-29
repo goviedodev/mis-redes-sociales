@@ -35,34 +35,21 @@ defmodule MisRedesSocialesWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
+    <header class="navbar px-4 sm:px-6 lg:px-8 border-b border-base-300 bg-base-100">
       <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
+        <a
+          href="/"
+          class="flex w-fit items-center gap-2 text-base-content hover:opacity-80 transition-opacity"
+        >
+          <span class="text-base font-bold tracking-tight">Mis Redes Sociales</span>
         </a>
       </div>
       <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
-          </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
-          <li>
-            <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-        </ul>
+        <.theme_toggle />
       </div>
     </header>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
+    <main class="px-4 py-12 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-2xl space-y-4">
         {render_slot(@inner_block)}
       </div>
@@ -116,37 +103,54 @@ defmodule MisRedesSocialesWeb.Layouts do
   end
 
   @doc """
-  Provides dark vs light theme toggle based on themes defined in app.css.
+  Provides light, dark, and sepia theme selector based on themes defined in app.css.
 
   See <head> in root.html.heex which applies the theme before page load.
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 transition-[left]" />
+    <div
+      id="theme-selector"
+      role="group"
+      aria-label="Selector de tema"
+      class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full"
+    >
+      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-0 [[data-theme=dark]_&]:left-1/3 [[data-theme=sepia]_&]:left-2/3 transition-[left]" />
 
       <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="system"
-      >
-        <.icon name="hero-computer-desktop-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
+        id="theme-btn-light"
+        type="button"
+        aria-label="Claro"
+        class="relative z-10 flex items-center justify-center gap-1 px-2.5 py-1.5 cursor-pointer w-1/3 text-xs font-medium opacity-75 hover:opacity-100 [[data-theme=light]_&]:opacity-100"
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="light"
       >
-        <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
+        <.icon name="hero-sun-micro" class="size-4" />
+        <span class="sr-only sm:not-sr-only">Claro</span>
       </button>
 
       <button
-        class="flex p-2 cursor-pointer w-1/3"
+        id="theme-btn-dark"
+        type="button"
+        aria-label="Oscuro"
+        class="relative z-10 flex items-center justify-center gap-1 px-2.5 py-1.5 cursor-pointer w-1/3 text-xs font-medium opacity-75 hover:opacity-100 [[data-theme=dark]_&]:opacity-100"
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="dark"
       >
-        <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
+        <.icon name="hero-moon-micro" class="size-4" />
+        <span class="sr-only sm:not-sr-only">Oscuro</span>
+      </button>
+
+      <button
+        id="theme-btn-sepia"
+        type="button"
+        aria-label="Sepia"
+        class="relative z-10 flex items-center justify-center gap-1 px-2.5 py-1.5 cursor-pointer w-1/3 text-xs font-medium opacity-75 hover:opacity-100 [[data-theme=sepia]_&]:opacity-100"
+        phx-click={JS.dispatch("phx:set-theme")}
+        data-phx-theme="sepia"
+      >
+        <.icon name="hero-book-open-micro" class="size-4" />
+        <span class="sr-only sm:not-sr-only">Sepia</span>
       </button>
     </div>
     """

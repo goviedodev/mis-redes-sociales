@@ -91,6 +91,41 @@
   --noise: 0;
 }
 
+@plugin "../vendor/daisyui-theme" {
+  name: "sepia";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(95% 0.025 82);
+  --color-base-200: oklch(91% 0.032 80);
+  --color-base-300: oklch(86% 0.04 78);
+  --color-base-content: oklch(28% 0.045 55);
+  --color-primary: oklch(56% 0.145 48);
+  --color-primary-content: oklch(97% 0.018 82);
+  --color-secondary: oklch(48% 0.095 62);
+  --color-secondary-content: oklch(96% 0.02 82);
+  --color-accent: oklch(52% 0.13 38);
+  --color-accent-content: oklch(97% 0.018 82);
+  --color-neutral: oklch(38% 0.045 58);
+  --color-neutral-content: oklch(95% 0.025 82);
+  --color-info: oklch(58% 0.12 235);
+  --color-info-content: oklch(97% 0.015 235);
+  --color-success: oklch(60% 0.12 160);
+  --color-success-content: oklch(97% 0.015 160);
+  --color-warning: oklch(66% 0.16 65);
+  --color-warning-content: oklch(98% 0.02 85);
+  --color-error: oklch(56% 0.2 25);
+  --color-error-content: oklch(97% 0.015 25);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.21875rem;
+  --size-field: 0.21875rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}
+
 /* Add variants based on LiveView classes */
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
